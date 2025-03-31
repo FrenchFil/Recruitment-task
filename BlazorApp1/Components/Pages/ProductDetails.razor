@@ -1,0 +1,32 @@
+﻿@page "/{ProductId:int}/details"
+@rendermode InteractiveServer
+@using MudBlazor
+@using Class
+@using Database
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
+@inject DataRepository dataRepository
+
+<MudContainer>
+    <MudPaper Elevation="3" Class="pa-4">
+        @if (product != null)
+        {
+            <MudText Typo="Typo.h4">@product.Title</MudText>
+            <MudText Typo="Typo.subtitle1">Cena: @product.Price.ToString("C")</MudText>
+        }
+        else
+        {
+            <MudText Typo="Typo.h6">Ładowanie produktu...</MudText>
+        }
+    </MudPaper>
+</MudContainer>
+
+@code {
+    [Parameter] public int ProductId { get; set; }
+    private Product? product;
+
+    protected override async Task OnInitializedAsync()
+    {
+        product = await dataRepository.GetProductById(ProductId);
+    }
+}

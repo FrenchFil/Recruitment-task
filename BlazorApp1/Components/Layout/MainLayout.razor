@@ -1,0 +1,35 @@
+﻿@inherits LayoutComponentBase
+@using MudBlazor;
+@using Microsoft.AspNetCore.Components.Authorization;
+
+@inject NavigationManager Navigation
+@inject HttpClient Http
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+<MudPopoverProvider />
+<MudLayout>
+    <MudAppBar Style="background-color:aqua; color:black;">
+        <a style="font-size:20px; text-decoration: none;" href="./">Weather App ☀️</a>
+        <AuthorizeView>
+            <NotAuthorized>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="margin:auto;" Href="Account/Register">Register</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="margin:auto;" Href="Account/Login">Login</MudButton>
+            </NotAuthorized>
+            <Authorized>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="margin:auto;" Href="product">Add product</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="margin:auto;" Href="Account/Manage">Manage your account</MudButton>
+            </Authorized>
+        </AuthorizeView>
+
+
+
+    </MudAppBar>
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+@code {
+
+}

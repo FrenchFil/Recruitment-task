@@ -1,0 +1,42 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@using MudBlazor
+@using Class
+@using Database
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
+@inject DataRepository dataRepository
+
+<MudGrid>
+    @foreach (var product in products)
+    {
+        <MudItem xs="12" md="4">
+            <MudCard>
+                <MudCardContent>
+                    <h4>@product.Title</h4>
+                    <p>@product.Price</p>
+                    <MudButton Color="Color.Primary" OnClick="@( () => GoToDetails(product) )">
+                        Zobacz szczegóły
+                    </MudButton>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    }
+</MudGrid>
+
+
+@code {
+    private List<Product> products = new List<Product>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await dataRepository.GetProductList();
+    }
+
+    private void ReloadPage()
+    {
+        Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+    }
+    private void GoToDetails(Product product) => Navigation.NavigateTo($"/{product.Id}/details");
+  
+}

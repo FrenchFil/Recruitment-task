@@ -1,0 +1,21 @@
+﻿@page "/weather"
+@rendermode InteractiveServer
+@using MudBlazor
+@using Class
+@using Database
+@using System.ComponentModel.DataAnnotations
+
+@inject NavigationManager Navigation
+
+@code {
+    private List<Product?> products = new List<Product?>();
+
+    private async Task LoadProducts()
+    {   
+
+    }
+    private void ReloadPage()
+    {
+        Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+    }
+}

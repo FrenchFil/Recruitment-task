@@ -1,0 +1,41 @@
+﻿@page "/product"
+
+@using System.ComponentModel.DataAnnotations
+@rendermode InteractiveServer
+@using MudBlazor
+@using Class
+@using Database
+
+@inject DataRepository dataRepository
+@inject NavigationManager Navigation
+
+<MudCard Class="pa-4">
+    <MudCardContent>
+        <MudForm Model="product" @ref="form" >
+            <MudTextField Label="Tytuł" For="@(() => product.Title)" Required="true" RequiredError="Tytuł jest wymagany"
+                          Validation="@(new Func<string, string>(value => value?.Length >= 3 ? null : "Tytuł musi mieć co najmniej 3 znaki"))" />
+
+            <MudTextField Label="Cena" For="@(() => product.Price)" Required="true" RequiredError="Cena jest wymagana"
+                          Type="Numeric" Adornment="Adornment.End" AdornmentText="PLN"
+                          Validation="@(new Func<decimal, string>(value => value > 0 ? null : "Cena musi być większa niż 0"))" />
+
+
+            <MudButton OnClick="Submit" Color="Color.Primary" Variant="Variant.Filled">Zapisz</MudButton>
+        </MudForm>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    private Product product = new Product();
+    private MudForm form;
+
+    private async Task Submit()
+    {
+        await form.Validate();
+        if (form.IsValid)
+        {
+            await dataRepository.AddProduct(product);
+            Navigation.NavigateTo("/");
+        }
+    }
+}
