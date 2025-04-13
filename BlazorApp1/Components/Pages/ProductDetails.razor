@@ -4,8 +4,12 @@
 @using Class
 @using Database
 @using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject IDialogService DialogService
 @inject NavigationManager Navigation
 @inject DataRepository dataRepository
+@inject HttpClient Http
 
 <MudContainer>
     <MudPaper Elevation="3" Class="pa-4">
@@ -13,6 +17,22 @@
         {
             <MudText Typo="Typo.h4">@product.Title</MudText>
             <MudText Typo="Typo.subtitle1">Cena: @product.Price.ToString("C")</MudText>
+            <AuthorizeView>
+                <NotAuthorized>
+                    @if(isVisible)
+                    {
+                        <MudButton Variant="Variant.Filled" Color="Color.Info" OnClick="showNegotiationMenu">Negotiate</MudButton>
+                    }
+                    @if (isNegotiationVisible)
+                    {
+                        <MudTextField Label="Cena" For="@(() => product.Price)" Required="true" RequiredError="Cena jest wymagana"
+                                      Type="Numeric" Adornment="Adornment.End" AdornmentText="PLN"
+                                      Validation="@(new Func<decimal, string>(value => value > 0 ? null : "Cena musi być większa niż 0"))" />
+
+                        <MudButton></MudButton>
+                    }
+                </NotAuthorized>
+            </AuthorizeView>
         }
         else
         {
@@ -24,9 +44,65 @@
 @code {
     [Parameter] public int ProductId { get; set; }
     private Product? product;
+    private List<Negotiation?> negotiations = new List<Negotiation?>();
+
+    private bool isVisible = true;
+
+    private bool isNegotiationVisible = false;
 
     protected override async Task OnInitializedAsync()
     {
         product = await dataRepository.GetProductById(ProductId);
+        var response = await Http.GetAsync($"https://localhost:7186/api/negotiations/{ProductId}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            negotiations = await response.Content.ReadFromJsonAsync<List<Negotiation?>>();
+            if(negotiations.Count > 0 && negotiations.Count > 3)
+            {
+                isVisible = false;
+            }
+            else if(negotiations.Count > 0)
+            {
+                foreach(var x in negotiations)
+                {
+                    if(x.isAccepted == true)
+                    {
+                        isVisible = false;
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            negotiations = new List<Negotiation?>(); 
+        }
     }
+
+    private void showNegotiationMenu()
+    {
+        isNegotiationVisible = !isNegotiationVisible;
+    }
+    private async void AddNegotiation()
+    {
+        var negotiation = new Negotiation
+            {
+                ProductId = ProductId,
+                Price = negotiatedPrice,
+                isAccepted = false
+            };
+
+        var response = await Http.PostAsJsonAsync("https://localhost:7186/api/negotiations", negotiation);
+
+        if (response.IsSuccessStatusCode)
+        {
+            isVisible = false;
+            isNegotiationVisible = false;
+        }
+        else
+        {
+        }
+    }
+
 }
