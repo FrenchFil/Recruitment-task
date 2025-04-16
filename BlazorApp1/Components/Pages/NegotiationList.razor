@@ -1,0 +1,45 @@
+﻿@page "/negotiations"
+@rendermode InteractiveServer
+@using MudBlazor
+@using Class
+@using Database
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
+@inject DataRepository dataRepository
+
+<MudGrid>
+    @foreach (var negotiation    in negotiations)
+    {
+        <MudItem xs="12" md="4">
+            <MudCard>
+                <MudCardContent>
+                    <h4>@negotiation.ProductId</h4>
+                    <p>@negotiation.Price</p>
+                    <MudButton Color="Color.Primary" OnClick="@( () => Delete(negotiation) )">
+                        Odrzuc
+                    </MudButton>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    private List<Negotiation> negotiations = new List<Negotiation>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        negotiations = await dataRepository.GetNegotiationList();
+    }
+    private void ReloadPage()
+    {
+        Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+    }
+
+    private async void Delete()
+    {
+        
+    }
+
+
+}

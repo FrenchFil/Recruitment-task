@@ -66,7 +66,30 @@ namespace BlazorApp1.Components.Database
             return product;
         }
 
-     
+        public async Task<List<Negotiation>> GetNegotiationList()
+        {
+            List<Negotiation> negotiations = [];
+            try
+            {
+                negotiations = await dbContext.Negotiations
+                    .ToListAsync();
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+            return negotiations;
+
+        }
+
+        public async Task<Negotiation> RejectNegotiation(Negotiation negotiation)
+        {
+
+        }
+
+
 
     }
 }
